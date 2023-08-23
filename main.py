@@ -24,19 +24,31 @@ def read_image(file):
 
 def predict(image):
     pred = np.argmax(image_classifier.predict(np.expand_dims(image, 0))[0])
-    match pred:
-        case 0:
-            return 'высокие горы вершины высота'
-        case 1:
-            return 'старинные здания музеи архитектура'
-        case 2:
-            return 'ледники белый снег'
-        case 3:
-            return 'зеленые леса деревья'
-        case 4:
-            return 'реки озера водоемы берега'
-        case 5:
-            return 'улицы парки скверы культура кафе магазин'
+    if pred == 0:
+        return 'высокие горы вершины высота'
+    elif pred == 1:
+        return 'старинные здания музеи архитектура'
+    elif pred == 2:
+        return 'ледники белый снег'
+    elif pred == 3:
+        return 'зеленые леса деревья'
+    elif pred == 4:
+        return 'реки озера водоемы берега'
+    elif pred == 5:
+        return 'улицы парки скверы культура кафе магазин'
+    # match pred:
+    #     case 0:
+    #         return 'высокие горы вершины высота'
+    #     case 1:
+    #         return 'старинные здания музеи архитектура'
+    #     case 2:
+    #         return 'ледники белый снег'
+    #     case 3:
+    #         return 'зеленые леса деревья'
+    #     case 4:
+    #         return 'реки озера водоемы берега'
+    #     case 5:
+    #         return 'улицы парки скверы культура кафе магазин'
 
 
 @app.post('/recommend-on-servey')
