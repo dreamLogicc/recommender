@@ -10,51 +10,20 @@ import numpy as np
 
 app = FastAPI(title = 'Recommender System')
 
-routes = pd.read_csv('data_for_db.csv')
+routes = pd.read_csv('data_with_array_emb.csv')
 route_difficulties = pd.DataFrame({'id': [1, 2, 3], 'name': ['новичок', 'знающий', 'опытный']})
 
 place_recommender = PlaceRecommender(routes['description'])
-image_classifier = keras.models.load_model('model.keras')
-
 
 def read_image(file):
     image = Image.open(io.BytesIO(file))
     return image
 
 
-def predict(image):
-    pred = np.argmax(image_classifier.predict(np.expand_dims(image, 0))[0])
-    if pred == 0:
-        return 'высокие горы вершины высота'
-    elif pred == 1:
-        return 'старинные здания музеи архитектура'
-    elif pred == 2:
-        return 'ледники белый снег'
-    elif pred == 3:
-        return 'зеленые леса деревья'
-    elif pred == 4:
-        return 'реки озера водоемы берега'
-    elif pred == 5:
-        return 'улицы парки скверы культура кафе магазин'
-    # match pred:
-    #     case 0:
-    #         return 'высокие горы вершины высота'
-    #     case 1:
-    #         return 'старинные здания музеи архитектура'
-    #     case 2:
-    #         return 'ледники белый снег'
-    #     case 3:
-    #         return 'зеленые леса деревья'
-    #     case 4:
-    #         return 'реки озера водоемы берега'
-    #     case 5:
-    #         return 'улицы парки скверы культура кафе магазин'
-
-
 @app.post('/recommend-on-servey')
 def recommend_on_servey(likes: str):
     try:
-        to_recommend = place_recommender.recommend(likes)
+        to_recommend = place_recommender.recommend_on_description(likes)
 
         result = {}
 
@@ -77,24 +46,23 @@ def recommend_on_servey(likes: str):
 
 @app.post('/recommend-on-image')
 async def recommend_on_image(file: UploadFile = File()):
-    try:
-        image = np.array(read_image(await file.read()))
-        image = cv2.resize(image, (150, 150))
-        caption = predict(image)
-        to_recommend = place_recommender.recommend(caption)
+    # try:
+    image = np.array(read_image(await file.read()))
+    image = cv2.resize(image, (224, 224))
+    to_recommend = place_recommender.recommend_on_image(image, routes['image_embeddings'])
 
-        result = {}
+    result = {}
 
-        for i in range(len(to_recommend)):
-            result[f'place{i}'] = {
-                'index': to_recommend[i] + 1,
-                'name': routes.iloc[to_recommend[i]]['name'],
-                'description': routes.iloc[to_recommend[i]]['description'],
-                'difficulty': route_difficulties.iloc[routes.iloc[to_recommend[i]]['difficulty_id'] - 1]['name'],
-                'longitude': routes.iloc[to_recommend[i]]['longitude'],
-                'latitude': routes.iloc[to_recommend[i]]['latitude'],
-                'rating': routes.iloc[to_recommend[i]]['rating']
-            }
-        return result
-    except Exception as ex:
-        print(ex)
+    for i in range(len(to_recommend)):
+        result[f'place{i}'] = {
+            'index': to_recommend[i] + 1,
+            'name': routes.iloc[to_recommend[i]]['name'],
+            'description': routes.iloc[to_recommend[i]]['description'],
+            'difficulty': route_difficulties.iloc[routes.iloc[to_recommend[i]]['difficulty_id'] - 1]['name'],
+            'longitude': routes.iloc[to_recommend[i]]['longitude'],
+            'latitude': routes.iloc[to_recommend[i]]['latitude'],
+            'rating': routes.iloc[to_recommend[i]]['rating']
+        }
+    return result
+# except Exception as ex:
+#     print(ex)
