@@ -3,6 +3,7 @@ FROM python
 ADD ./main.py .
 ADD ./recommender.py .
 ADD ./data_with_array_emb.csv .
+ADD ./clf.keras .
 
 COPY ./requirements.txt .
 
