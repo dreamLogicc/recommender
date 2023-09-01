@@ -44,7 +44,7 @@ def recommend_on_history(history: str):
 @app.post('/recommend-on-image')
 async def recommend_on_image(file: UploadFile = File()):
     try:
-        if file.filename.split('.')[1].lower() not in ('jpg', 'png', 'jpeg', 'ppm', 'tiff', 'bmp'):
+        if file.filename.split('.')[-1].lower() not in ('jpg', 'png', 'jpeg', 'ppm', 'tiff', 'bmp'):
             raise Exception('Invalid file format')
 
         image = np.array(read_image(await file.read()))

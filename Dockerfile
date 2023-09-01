@@ -1,10 +1,9 @@
 FROM python
 
-ADD ./main.py .
-ADD ./recommender.py .
-ADD ./data_with_array_emb.csv .
-ADD ./clf.keras .
-
+COPY ./main.py .
+COPY ./recommender.py .
+COPY ./data_with_array_emb.csv .
+COPY ./clf.keras .
 COPY ./requirements.txt .
 
 RUN pip install --upgrade pip
