@@ -2,7 +2,7 @@ FROM python
 
 COPY ./main.py .
 COPY ./recommender.py .
-COPY ./data_with_array_emb.csv .
+COPY ./data_with_array_emb_custom.csv .
 COPY ./clfv2.keras .
 COPY ./requirements.txt .
 COPY ./feature_extractor.keras .
