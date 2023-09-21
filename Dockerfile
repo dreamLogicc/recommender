@@ -2,10 +2,10 @@ FROM python
 
 COPY ./main.py .
 COPY ./recommender.py .
-COPY ./data_with_array_emb_custom.csv .
-COPY ./clfv2.keras .
+COPY ./data_vgg19.csv .
+COPY ./clfv5.keras .
 COPY ./requirements.txt .
-COPY ./feature_extractor.keras .
+
 
 RUN pip install --upgrade pip
 RUN pip install protobuf==3.20.*

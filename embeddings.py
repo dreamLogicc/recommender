@@ -1,32 +1,31 @@
-import keras.models
 import pandas as pd
 import cv2
 from skimage import io
 import numpy as np
-from PIL import Image
+from keras.applications import vgg19
 from keras.models import Model
 from keras.applications.imagenet_utils import preprocess_input
 
 data = pd.read_csv('data_for_db.csv')
 
-model = keras.models.load_model('feature_extractor.keras')
+vgg_model = vgg19.VGG19(weights = 'imagenet')
 
-feat_extractor = Model(inputs = model.input, outputs = model.get_layer("dense_1").output)
+feat_extractor = Model(inputs = vgg_model.input, outputs = vgg_model.get_layer("fc2").output)
 
 images = []
 for url in data['image_link']:
-    images.append(
-        np.expand_dims(cv2.resize(io.imread(url), (150, 150), interpolation = cv2.INTER_AREA) / 255.0, axis = 0))
+    images.append(np.expand_dims(cv2.resize(io.imread(url), (224, 224)), axis = 0))
     print('success ' + url)
 
 print(images[34].shape)
 
-imgs_features = []
-for image in images:
-    imgs_features.append(feat_extractor.predict(image))
+images = np.vstack(images)
+
+processed_images = preprocess_input(images.copy())
+
+imgs_features = feat_extractor.predict(processed_images)
 print("features successfully extracted!")
-imgs_features = np.array(imgs_features)
 print(imgs_features.shape)
 
 data['image_embeddings'] = pd.Series(imgs_features.tolist())
-data.to_csv('data_with_array_emb_custom.csv', index = False)
+data.to_csv('data_vgg19.csv', index = False)
